@@ -51,18 +51,24 @@ const Hero = () => {
       <motion.div
         variants={staggerContainer}
         initial="hidden"
-        whileInView="show"
-        viewport={{ once: false, amount: 0.25 }}
+        animate="show"
         className={`${styles.innerWidth2} mx-auto flex flex-col relative z-10 w-full`}
       >
         <div className="flex flex-col items-start justify-end">
           <motion.div
             variants={textVariant(1.1)}
-            className="w-full"
+            className="w-fit relative inline-block group"
           >
             <KineticTypography
               text={t.heroTitle1}
               className="text-[40px] lg:text-[120px] md:text-[80px] leading-[1] uppercase font-black text-white drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]"
+            />
+            {/* Stylish Underline */}
+            <motion.div
+              initial={{ width: 0 }}
+              whileInView={{ width: '100%' }}
+              transition={{ duration: 1, delay: 1.5, ease: "easeOut" }}
+              className="absolute -bottom-2 left-0 h-[4px] lg:h-[8px] bg-gradient-to-r from-purple-600 to-transparent rounded-full shadow-[0_0_15px_rgba(165,9,255,0.5)]"
             />
           </motion.div>
           <motion.div

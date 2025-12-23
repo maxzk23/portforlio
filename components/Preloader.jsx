@@ -12,24 +12,32 @@ const Preloader = ({ onComplete }) => {
             setPercent((prev) => {
                 if (prev >= 100) {
                     clearInterval(timer);
-                    setTimeout(() => setIsFinished(true), 500);
-                    setTimeout(() => onComplete(), 2500);
                     return 100;
                 }
-                // Random speed for a more natural loading feel
-                const diff = Math.floor(Math.random() * 8) + 1;
+                const diff = Math.floor(Math.random() * 6) + 1;
                 return Math.min(prev + diff, 100);
             });
         }, 100);
 
         return () => clearInterval(timer);
-    }, [onComplete]);
+    }, []);
+
+    useEffect(() => {
+        if (percent >= 100) {
+            const finishTimer = setTimeout(() => setIsFinished(true), 800);
+            const completeTimer = setTimeout(() => onComplete(), 3000);
+            return () => {
+                clearTimeout(finishTimer);
+                clearTimeout(completeTimer);
+            };
+        }
+    }, [percent, onComplete]);
 
     return (
         <motion.div
             initial={{ opacity: 1 }}
             exit={{ opacity: 0, transition: { duration: 1, ease: 'easeInOut' } }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-[#050505] overflow-hidden"
+            className="fixed inset-0 z-[99999] flex items-center justify-center bg-[#050505] overflow-hidden"
         >
             <AnimatePresence mode="wait">
                 {!isFinished ? (

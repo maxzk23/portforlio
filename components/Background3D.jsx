@@ -17,7 +17,7 @@ const AnimatedSphere = () => {
 
     return (
         <Float speed={2} rotationIntensity={1} floatIntensity={2}>
-            <Sphere args={[1, 100, 200]} scale={2.4} ref={meshRef}>
+            <Sphere args={[1, 32, 32]} scale={2.4} ref={meshRef}>
                 <MeshDistortMaterial
                     color="#3d1c56"
                     attach="material"
@@ -33,12 +33,15 @@ const AnimatedSphere = () => {
 const Background3D = () => {
     return (
         <div className="absolute inset-0 z-[-1] opacity-50">
-            <Canvas camera={{ position: [0, 0, 5], fov: 75 }}>
+            <Canvas
+                camera={{ position: [0, 0, 5], fov: 75 }}
+                gl={{ antialias: false, powerPreference: "high-performance" }}
+                dpr={[1, 1.5]}
+            >
                 <ambientLight intensity={0.5} />
                 <directionalLight position={[10, 10, 5]} intensity={1} />
                 <pointLight position={[-10, -10, -5]} color="#A509FF" intensity={2} />
                 <AnimatedSphere />
-                {/* <OrbitControls enableZoom={false} /> */}
             </Canvas>
         </div>
     );
