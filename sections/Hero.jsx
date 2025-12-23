@@ -1,60 +1,88 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { useRef } from 'react';
 import styles from '../styles';
-import { slideIn, staggerContainer, textVariant } from '../utils/motion';
+import { slideIn, staggerContainer, textVariant, fadeIn } from '../utils/motion';
+import { KineticTypography, Background3D } from '../components';
 
-const Hero = () => (
-  <section className={`${styles.yPaddings} sm:pl-16 pl-6`}>
-    <motion.div
-      variants={staggerContainer}
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: false, amount: 0.25 }}
-      className={`${styles.innerWidth2} mx-auto flex flex-col`}
-    >
-      <div className="relative z-10 flex flex-col items-center justify-center">
-        <motion.h1
-          variants={textVariant(1.1)}
-          className={styles.heroHeading}
-        >
-          Metadroid
-        </motion.h1>
-        <motion.div
-          variants={textVariant(1.2)}
-          className="flex flex-row items-center justify-center"
-        >
-          <h1 className={styles.heroHeading}> Ma</h1>
-          <div className={styles.heroDText} />
-          <h1 className={styles.heroHeading}> Ness</h1>
-        </motion.div>
-      </div>
+import { useLanguage } from '../context/LanguageContext';
+import { translations } from '../constants';
+
+const Hero = () => {
+  const containerRef = useRef(null);
+  const { language } = useLanguage();
+  const t = translations[language];
+
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['start start', 'end start'],
+  });
+
+  const y = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
+  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+
+  return (
+    <section ref={containerRef} className={`${styles.yPaddings} sm:pl-16 pl-6 relative min-h-screen flex flex-col justify-center overflow-hidden`}>
+      {/* Background Image with Parallax and Overlay */}
+      <motion.div
+        style={{ y, opacity: 0.9 }}
+        className="absolute inset-0 z-0 overflow-hidden flex justify-end"
+      >
+        <div className="w-full lg:w-[60%] h-full relative">
+          <img
+            src="/max.png"
+            alt="background"
+            className="w-full h-full object-cover object-center -translate-y-5 scale-110"
+          />
+          {/* Seamless Blend Gradients */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#050505] via-[#050505]/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#050505]/40 via-transparent to-transparent" />
+        </div>
+      </motion.div>
+
+      <Background3D />
 
       <motion.div
-        variants={slideIn('right', 'tween', 0.2, 1)}
-        className="relative w-full lg:-mt-[30px] md:-mt-[18px] -mt-[15px]  2xl:pl-[280px]"
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: false, amount: 0.25 }}
+        className={`${styles.innerWidth2} mx-auto flex flex-col relative z-10 w-full`}
       >
-        <div className="absolute w-full h-[300px] hero-gradient rounded-tl-[140px] z-[0] sm:-top-[20px] -top-[10px]" />
-        <img
-          src="/cover.png"
-          alt="cover"
-          className="w-full sm:h-[500px] h-[350px] object-cover rounded-tl-[140px] z-10 relative"
-        />
-
-        <a href="#explore">
-          <div className="w-full flex justify-end sm:-mt-[70px] -mt-[50px] pr-[40px] relative z-10 2xl:-ml-[100px]">
-            <motion.img
-              src="/stamp.png"
-              alt="stamp"
-              className="sm:w-[155px] w-[100px] sm:h-[155px] h-[100px] object-contain "
-              animate={{ rotate: 360 }}
-              transition={{ repeat: Infinity, duration: 7, repeatType: 'loop' }}
+        <div className="flex flex-col items-start justify-end">
+          <motion.div
+            variants={textVariant(1.1)}
+            style={{ opacity }}
+            className="w-full"
+          >
+            <KineticTypography
+              text={t.heroTitle1}
+              className="text-[40px] lg:text-[120px] md:text-[80px] leading-[1] uppercase font-black text-white drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]"
             />
-          </div>
-        </a>
+          </motion.div>
+          <motion.div
+            variants={textVariant(1.2)}
+            className="flex flex-row items-center justify-start w-full"
+            style={{ opacity }}
+          >
+            <KineticTypography
+              text={t.heroTitle2}
+              className="text-[40px] lg:text-[120px] md:text-[80px] leading-[1] uppercase font-black text-white drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]"
+            />
+          </motion.div>
+
+          <motion.p
+            variants={textVariant(1.3)}
+            className="mt-4 text-secondary-white text-[16px] lg:text-[20px] uppercase tracking-[5px] lg:tracking-[10px] font-light bg-black/20 backdrop-blur-sm px-4 py-1 rounded-sm"
+          >
+            {t.heroRole}
+          </motion.p>
+        </div>
+
       </motion.div>
-    </motion.div>
-  </section>
-);
+    </section>
+  );
+};
 
 export default Hero;

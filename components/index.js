@@ -6,6 +6,10 @@ import NewFeatures from './NewFeatures';
 import InsightCard from './InsightCard';
 import Footer from './Footer';
 
+import CustomCursor from './CustomCursor';
+import KineticTypography from './KineticTypography';
+import Background3D from './Background3D';
+
 export {
   Navbar,
   TitleText,
@@ -15,4 +19,7 @@ export {
   ExploreCard,
   InsightCard,
   Footer,
+  KineticTypography,
+  Background3D,
+  CustomCursor,
 };
