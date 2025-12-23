@@ -7,6 +7,8 @@ import InsightCard from './InsightCard';
 import Footer from './Footer';
 
 import CustomCursor from './CustomCursor';
+import Preloader from './Preloader';
+import MouseGlow from './MouseGlow';
 import KineticTypography from './KineticTypography';
 import Background3D from './Background3D';
 
@@ -22,4 +24,6 @@ export {
   KineticTypography,
   Background3D,
   CustomCursor,
+  Preloader,
+  MouseGlow,
 };
