@@ -1,9 +1,9 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 
-const Preloader = ({ onComplete }) => {
+const Preloader = memo(({ onComplete }) => {
     const [percent, setPercent] = useState(0);
     const [isFinished, setIsFinished] = useState(false);
 
@@ -14,18 +14,19 @@ const Preloader = ({ onComplete }) => {
                     clearInterval(timer);
                     return 100;
                 }
-                const diff = Math.floor(Math.random() * 6) + 1;
+                // Faster increment for quicker loading
+                const diff = Math.floor(Math.random() * 10) + 5;
                 return Math.min(prev + diff, 100);
             });
-        }, 100);
+        }, 80); // Faster interval
 
         return () => clearInterval(timer);
     }, []);
 
     useEffect(() => {
         if (percent >= 100) {
-            const finishTimer = setTimeout(() => setIsFinished(true), 800);
-            const completeTimer = setTimeout(() => onComplete(), 3000);
+            const finishTimer = setTimeout(() => setIsFinished(true), 300);
+            const completeTimer = setTimeout(() => onComplete(), 800); // Faster completion
             return () => {
                 clearTimeout(finishTimer);
                 clearTimeout(completeTimer);
@@ -36,16 +37,17 @@ const Preloader = ({ onComplete }) => {
     return (
         <motion.div
             initial={{ opacity: 1 }}
-            exit={{ opacity: 0, transition: { duration: 1, ease: 'easeInOut' } }}
+            exit={{ opacity: 0, transition: { duration: 0.4, ease: 'easeInOut' } }}
             className="fixed inset-0 z-[99999] flex items-center justify-center bg-[#050505] overflow-hidden"
         >
             <AnimatePresence mode="wait">
                 {!isFinished ? (
                     <motion.div
                         key="counter"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
                         className="flex flex-col items-center"
                     >
                         <span className="text-white text-[120px] font-black tracking-tighter tabular-nums leading-none">
@@ -55,6 +57,7 @@ const Preloader = ({ onComplete }) => {
                             <motion.div
                                 initial={{ width: 0 }}
                                 animate={{ width: `${percent}%` }}
+                                transition={{ duration: 0.1 }}
                                 className="h-full bg-white"
                             />
                         </div>
@@ -67,7 +70,7 @@ const Preloader = ({ onComplete }) => {
                         <motion.h1
                             initial={{ y: '100%' }}
                             animate={{ y: 0 }}
-                            transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
+                            transition={{ duration: 0.5, ease: [0.76, 0, 0.24, 1] }}
                             className="text-white text-[40px] md:text-[80px] lg:text-[100px] font-black uppercase tracking-[0.1em] leading-[1.1]"
                         >
                             DEVELOPER
@@ -75,7 +78,7 @@ const Preloader = ({ onComplete }) => {
                         <motion.h1
                             initial={{ y: '100%' }}
                             animate={{ y: 0 }}
-                            transition={{ duration: 0.8, delay: 0.1, ease: [0.76, 0, 0.24, 1] }}
+                            transition={{ duration: 0.5, delay: 0.05, ease: [0.76, 0, 0.24, 1] }}
                             className="text-white text-[40px] md:text-[80px] lg:text-[100px] font-black uppercase tracking-[0.1em] leading-[1.1]"
                         >
                             PORTFOLIO
@@ -84,17 +87,12 @@ const Preloader = ({ onComplete }) => {
                 )}
             </AnimatePresence>
 
-            {/* Background Decorative Shavings or Glow */}
-            <motion.div
-                animate={{
-                    scale: [1, 1.2, 1],
-                    opacity: [0.3, 0.5, 0.3]
-                }}
-                transition={{ repeat: Infinity, duration: 4 }}
-                className="absolute w-[500px] h-[500px] bg-primary-black rounded-full blur-[150px] pointer-events-none -z-10"
-            />
+            {/* Simplified background glow */}
+            <div className="absolute w-[500px] h-[500px] bg-primary-black rounded-full blur-[150px] pointer-events-none -z-10 opacity-30" />
         </motion.div>
     );
-};
+});
+
+Preloader.displayName = 'Preloader';
 
 export default Preloader;

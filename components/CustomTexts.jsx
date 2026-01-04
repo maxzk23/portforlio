@@ -2,20 +2,26 @@
 
 import { motion } from 'framer-motion';
 import { textContainer, textVariant2 } from '../utils/motion';
+import { useState, useEffect } from 'react';
 
-export const TypingText = ({ title, textStyles }) => (
-  <motion.p
-    variants={textContainer}
-    className={`font-normal text-[14px] text-secondary-white ${textStyles}`}
-  >
-    {Array.from(title).map((letter, i) => (
-      <motion.span variants={textVariant2} key={i}>
-        {letter === ' ' ? '\u00A0' : letter}
-      </motion.span>
-    ))}
-  </motion.p>
-
-);
+export const TypingText = ({ title, textStyles }) => {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+  if (!mounted) return <p className={`font-normal text-[14px] text-secondary-white ${textStyles}`}>{title}</p>;
+  const characters = title.match(/[ก-ฮ\w]\p{M}*|./gu) || [];
+  return (
+    <motion.p
+      variants={textContainer}
+      className={`font-normal text-[14px] text-secondary-white ${textStyles}`}
+    >
+      {characters.map((letter, i) => (
+        <motion.span variants={textVariant2} key={`${letter}-${i}`}>
+          {letter === ' ' ? '\u00A0' : letter}
+        </motion.span>
+      ))}
+    </motion.p>
+  );
+};
 
 export const TitleText = ({ title, textStyles }) => (
   <motion.h2

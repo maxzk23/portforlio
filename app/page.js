@@ -1,103 +1,94 @@
 'use client';
 
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
-import { useState, useCallback, useEffect } from 'react';
-import { Footer, Navbar, CustomCursor, Preloader, MouseGlow } from '../components';
-import { About, Explore, Feedback, GetStarted, Hero, Insights, WhatsNew, World } from '../sections';
+import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion';
+import { lazy, Suspense, useState, useEffect } from 'react';
+import { Navbar } from '../components';
+import { Hero } from '../sections';
 import { ReactLenis } from '@studio-freight/react-lenis';
-import { useSpring } from 'framer-motion';
+
+// Lazy load sections below the fold for better performance
+const About = lazy(() => import('../sections/About'));
+const GetStarted = lazy(() => import('../sections/GetStarted'));
+const WhatsNew = lazy(() => import('../sections/WhatsNew'));
+const World = lazy(() => import('../sections/World'));
+const Insights = lazy(() => import('../sections/Insights'));
+const Feedback = lazy(() => import('../sections/Feedback'));
+const Contact = lazy(() => import('../sections/Contact'));
+const Footer = lazy(() => import('../components/Footer'));
 
 const Page = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [isMounted, setIsMounted] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setIsMounted(true);
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2800);
+    return () => clearTimeout(timer);
   }, []);
-
-  const handleLoadingComplete = useCallback(() => {
-    setIsLoading(false);
-  }, []);
-
-  const { scrollYProgress } = useScroll();
-
-  // Tighter spring for more responsive feel (less "perceived lag")
-  const smoothProgress = useSpring(scrollYProgress, { damping: 30, stiffness: 100, restDelta: 0.001 });
-
-  const scale = useTransform(smoothProgress, [0, 1], [1, 1.01]);
-  const backgroundColor = useTransform(
-    smoothProgress,
-    [0, 0.2, 0.4, 0.6, 0.8, 1],
-    ['#050505', '#0a0a1a', '#050505', '#1a0a1a', '#050505', '#0a0a1a']
-  );
-
-  const heroScale = useTransform(smoothProgress, [0, 0.12], [1, 1.15]);
-  const heroOpacity = useTransform(smoothProgress, [0, 0.08], [1, 0]);
-  const contentY = useTransform(smoothProgress, [0, 0.12], ['0%', '-1%']);
-  const contentScale = useTransform(smoothProgress, [0, 0.12], [0.99, 1]);
-
-  if (!isMounted) return <div className="bg-primary-black min-h-screen" />;
 
   return (
-    <ReactLenis root options={{ lerp: 0.05, duration: 1.2, smoothTouch: true }}>
-      <div className="bg-primary-black relative min-h-screen selection:bg-purple-500/30 overflow-x-hidden">
-        <AnimatePresence mode="wait">
-          {isLoading && (
-            <Preloader key="loader" onComplete={handleLoadingComplete} />
-          )}
-        </AnimatePresence>
+    <ReactLenis root options={{ lerp: 0.15, duration: 1.2, smoothTouch: true }}>
+      <AnimatePresence mode="wait">
+        {loading && (
+          <motion.div
+            key="preloader"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0, transition: { duration: 1, ease: 'easeInOut' } }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-primary-black"
+          >
+            <div className="flex flex-col items-center">
+              <motion.h1
+                initial={{ opacity: 0, y: 20, filter: 'blur(10px)' }}
+                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                transition={{ duration: 1.5, ease: 'easeOut' }}
+                className="text-white text-[48px] md:text-[80px] font-black tracking-[0.5em] uppercase"
+              >
+                WELCOME
+              </motion.h1>
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: '100%' }}
+                transition={{ duration: 2, ease: 'easeInOut', delay: 0.5 }}
+                className="h-[2px] bg-accent-mint mt-4 opacity-50"
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-        <MouseGlow />
-        <CustomCursor />
-
-        <motion.div
-          className="relative will-change-transform"
-          style={{ backgroundColor, scale }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: isLoading ? 0 : 1 }}
-          transition={{ duration: 1.2, ease: [0.43, 0.13, 0.23, 0.96] }}
-        >
+      <div className="bg-primary-black relative min-h-screen selection:bg-accent-mint/30 overflow-x-hidden">
+        <div className="relative">
           <Navbar />
 
-          {/* Prevent bleeding into next page by using overflow-hidden */}
-          <motion.div
-            style={{
-              scale: heroScale,
-              opacity: heroOpacity,
-              pointerEvents: scrollYProgress.get() > 0.08 ? 'none' : 'auto'
-            }}
-            className="will-change-[scale,opacity] overflow-hidden sticky top-0"
-          >
-            <Hero />
-          </motion.div>
+          <Hero />
 
-          <motion.div
-            style={{ y: contentY, scale: contentScale }}
-            className="relative z-20 will-change-transform"
-          >
-            <div className="relative">
-              <About />
-              <div className="gradient-03 z-0" />
-              <Explore />
-            </div>
+          <div className="relative z-20">
+            <Suspense fallback={null}>
+              <div className="relative">
+                <About />
+                <div className="gradient-03 z-0" />
+              </div>
 
-            <div className="relative">
-              <GetStarted />
-              <div className="gradient-04 z-0" />
-              <WhatsNew />
-            </div>
-            <World />
-            <div className="relative">
-              <Insights />
-              <div className="gradient-04 z-0" />
-              <Feedback />
-            </div>
-            <Footer />
-          </motion.div>
-        </motion.div>
+              <div className="relative">
+                <GetStarted />
+                <div className="gradient-04 z-0" />
+                <WhatsNew />
+              </div>
+              <World />
+              <div className="relative">
+                <Insights />
+                <div className="gradient-04 z-0" />
+                <Feedback />
+              </div>
+              <Contact />
+              <Footer />
+            </Suspense>
+          </div>
+        </div>
       </div>
     </ReactLenis>
   );
 };
 
 export default Page;
+

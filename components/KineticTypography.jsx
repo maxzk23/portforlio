@@ -8,7 +8,8 @@ const KineticTypography = ({ text, className }) => {
       {text.split('').map((char, index) => (
         <span
           key={index}
-          className="inline-block whitespace-pre hover:scale-110 hover:text-[#A509FF] transition-all duration-300 ease-out cursor-default"
+          className="inline-block whitespace-pre hover:scale-110 hover:text-[#A509FF] transition-transform duration-200 ease-out cursor-default"
+          style={{ transform: 'translate3d(0, 0, 0)' }}
         >
           {char}
         </span>
@@ -17,4 +18,4 @@ const KineticTypography = ({ text, className }) => {
   );
 };
 
-export default KineticTypography;
+export default React.memo(KineticTypography);

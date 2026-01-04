@@ -1,10 +1,10 @@
 'use client';
 
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Float, MeshDistortMaterial, Sphere, OrbitControls } from '@react-three/drei';
-import { useRef } from 'react';
+import { Float, MeshDistortMaterial, Sphere } from '@react-three/drei';
+import { useRef, useState, useEffect, memo } from 'react';
 
-const AnimatedSphere = () => {
+const AnimatedSphere = memo(() => {
     const meshRef = useRef();
 
     useFrame((state) => {
@@ -17,7 +17,7 @@ const AnimatedSphere = () => {
 
     return (
         <Float speed={2} rotationIntensity={1} floatIntensity={2}>
-            <Sphere args={[1, 32, 32]} scale={2.4} ref={meshRef}>
+            <Sphere args={[1, 12, 12]} scale={2.4} ref={meshRef}>
                 <MeshDistortMaterial
                     color="#3d1c56"
                     attach="material"
@@ -28,23 +28,19 @@ const AnimatedSphere = () => {
             </Sphere>
         </Float>
     );
-};
+});
 
-const Background3D = () => {
+AnimatedSphere.displayName = 'AnimatedSphere';
+
+const Background3D = memo(() => {
+    // Always use gradient for better performance and LCP
     return (
         <div className="absolute inset-0 z-[-1] opacity-50">
-            <Canvas
-                camera={{ position: [0, 0, 5], fov: 75 }}
-                gl={{ antialias: false, powerPreference: "high-performance" }}
-                dpr={[1, 1.5]}
-            >
-                <ambientLight intensity={0.5} />
-                <directionalLight position={[10, 10, 5]} intensity={1} />
-                <pointLight position={[-10, -10, -5]} color="#A509FF" intensity={2} />
-                <AnimatedSphere />
-            </Canvas>
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 to-transparent" />
         </div>
     );
-};
+});
+
+Background3D.displayName = 'Background3D';
 
 export default Background3D;
